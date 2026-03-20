@@ -59,4 +59,4 @@ npm run dev
 ---
 
 Made with ☕ + 🎧 + a bit of procrastination
->>>>>>> ef206118050a933cbad58fe9942e8d4f37a12ab2
+
