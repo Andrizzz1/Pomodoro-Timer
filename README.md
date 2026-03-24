@@ -31,7 +31,7 @@ It also aims to provide a simple productivity tool that is visually appealing an
 
 ## 📸 Demo
 
-(Add screenshots or GIFs here)
+![Demo](https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExenhkc3h1ZG85cmRybDI4Yml6YjFvcjZpMHA0cTB6YXE5OXZwa2U5diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NTfftboDO0NyeP8nMm/giphy.gif)
 
 ## 📦 Installation
 
