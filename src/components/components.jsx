@@ -28,8 +28,8 @@ function SettingsModal({ isOpen, onClose, settings, onSave }) {
     }
 
     return (
-        <div className="fixed inset-0 bg-white/30 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50">
-            <div className={`${tempSettings.darkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-3xl p-8 w-96 shadow-2xl max-h-[90vh] flex flex-col transition-colors`}>
+        <div className="fixed inset-0 bg-white/30 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className={`${tempSettings.darkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-3xl p-6 sm:p-8 w-full max-w-sm sm:max-w-md shadow-2xl max-h-[90vh] flex flex-col transition-colors`}>
                 <div className="flex justify-between items-center mb-6">
                     <h2 className={`text-2xl font-bold ${tempSettings.darkMode ? 'text-pink-300' : 'text-[#864958]'}`}>Settings</h2>
                     <button onClick={onClose} className="hover:opacity-70">
@@ -138,12 +138,13 @@ function SettingsModal({ isOpen, onClose, settings, onSave }) {
     )
 }
 
-function Countdown({ duration, isRunning, activeButton, hasStarted, onTimeChange, darkMode }) {
+function Countdown({ duration, isRunning, activeButton, hasStarted, onTimeChange, darkMode, onReset }) {
     const [time, setTime] = useState(duration)
 
     useEffect(() => {
         setTime(duration)
-    }, [duration])
+        onTimeChange(duration)
+    }, [duration, onTimeChange])
 
     useEffect(() => {
         if (!isRunning) return
@@ -172,16 +173,16 @@ function Countdown({ duration, isRunning, activeButton, hasStarted, onTimeChange
     if (!hasStarted) {
         return (
             <div className="text-center">
-                <p className={`text-center text-sm opacity-80 uppercase font-semibold tracking-widest transition-colors duration-300 ${darkMode ? 'text-gray-300' : ''}`}>start working now</p>
-                <h1 className={`uppercase font-bold text-7xl transition-colors duration-300 ${darkMode ? 'text-pink-300' : 'text-[#864958]'}`}>{format(minutes)}:{format(secs)}</h1>
+                <p className={`text-center text-xs sm:text-sm opacity-80 uppercase font-semibold tracking-widest transition-colors duration-300 ${darkMode ? 'text-gray-300' : ''}`}>start working now</p>
+                <h1 className={`uppercase font-bold text-5xl sm:text-6xl md:text-7xl transition-colors duration-300 ${darkMode ? 'text-pink-300' : 'text-[#864958]'}`}>{format(minutes)}:{format(secs)}</h1>
             </div>
         )
     }
 
     return (
         <div>
-            <p className={`text-center text-sm opacity-80 uppercase font-semibold tracking-widest transition-colors duration-300 ${darkMode ? 'text-gray-300' : ''}`}>{description}</p>
-            <h1 className={`uppercase font-bold text-7xl transition-colors duration-300 ${darkMode ? 'text-pink-300' : 'text-[#864958]'}`}>{format(minutes)}:{format(secs)}</h1>
+            <p className={`text-center text-xs sm:text-sm opacity-80 uppercase font-semibold tracking-widest transition-colors duration-300 ${darkMode ? 'text-gray-300' : ''}`}>{description}</p>
+            <h1 className={`uppercase font-bold text-5xl sm:text-6xl md:text-7xl text-center transition-colors duration-300 ${darkMode ? 'text-pink-300' : 'text-[#864958]'}`}>{format(minutes)}:{format(secs)}</h1>
         </div>
     )
 }
@@ -200,6 +201,7 @@ function Components({ showSettings: externalShowSettings, onCloseSettings, onDar
     const [isRunning, setIsRunning] = useState(false)
     const [hasStarted, setHasStarted] = useState(false)
     const [currentTime, setCurrentTime] = useState(25 * 60)
+    const [resetKey, setResetKey] =  useState(0)
     const [audioRef] = useState(new Audio())
 
     const handleCloseSettings = () => {
@@ -249,7 +251,12 @@ function Components({ showSettings: externalShowSettings, onCloseSettings, onDar
         setCurrentTime(duration)
         setIsRunning(false)
         setHasStarted(false)
+        setResetKey(prev => prev + 1) // Force Countdown to reset its internal state
     }
+
+    useEffect(() => {
+        setCurrentTime(minute)
+    }, [minute])
 
     const handleStartPause = () => {
         setIsRunning(!isRunning)
@@ -266,58 +273,60 @@ function Components({ showSettings: externalShowSettings, onCloseSettings, onDar
                 settings={settings}
                 onSave={handleSaveSettings}
             />
-            <section className="flex justify-center items-center flex-col transition-all duration-300">
-                <div className={`relative ${settings.darkMode ? 'bg-gray-800' : 'bg-[#ffffff]'} w-xl h-[500px] rounded-4xl flex justify-around flex-col items-center mt-14 transition-all duration-300`}>
-                    <img className="absolute w-36 bottom-0 -right-10 shadow-2xl rounded-2xl rotate-2 hover:rotate-0 transition-transform" src={settings.imageUrl} alt="pomodoro" />
-                <div className={`flex p-1 ${settings.darkMode ? 'bg-gray-700' : 'bg-[#d6dfda]'} rounded-3xl w-fit gap-4 transition-all duration-300`}>
+            <section className="flex justify-center items-center flex-col transition-all duration-300 max-md:mt-10">
+                <div className={`relative ${settings.darkMode ? 'bg-gray-800' : 'bg-[#ffffff]'} w-full max-w-xl h-auto min-h-[400px] sm:h-[500px] rounded-3xl sm:rounded-4xl flex justify-around flex-col items-center mt-8 sm:mt-14 p-6 sm:p-8 transition-all duration-300 max-sm:gap-32`}>
+                    <img className="hidden sm:block absolute w-24 sm:w-36 bottom-0 -right-6 sm:-right-10 shadow-2xl rounded-2xl rotate-2 hover:rotate-0 transition-transform" src={settings.imageUrl} alt="pomodoro" />
+                <div className={`flex p-1 ${settings.darkMode ? 'bg-gray-700' : 'bg-[#d6dfda]'} justify-center rounded-3xl w-full sm:w-fit gap-2 sm:gap-4 transition-all duration-300`}>
                     <button
                         onClick={() => handleModeChange("work")}
-                        className={`cursor-pointer py-0.5 px-2 rounded-3xl font-semibold transition-all duration-300 ${activeButton === "work" ? "bg-pink-400 text-[#4d1b29]" : settings.darkMode ? "bg-transparent hover:text-pink-300 text-gray-300" : "bg-transparent hover:text-[#4d1b29]"}`}>
+                        className={` cursor-pointer py-1 px-3 sm:py-0.5 sm:px-2 rounded-3xl font-semibold text-xs max-sm:text-lg transition-all duration-300 ${activeButton === "work" ? "bg-pink-400 text-[#4d1b29]" : settings.darkMode ? "bg-transparent hover:text-pink-300 text-gray-300" : "bg-transparent hover:text-[#4d1b29]"}`}>
                         Work
                     </button>
                     <button
                         onClick={() => handleModeChange("short")}
-                        className={`cursor-pointer py-0.5 px-2 rounded-3xl font-semibold transition-all duration-300 ${activeButton === "short" ? "bg-pink-400 text-[#4d1b29]" : settings.darkMode ? "hover:text-pink-300 text-gray-300" : "hover:text-[#4d1b29]"}`}>
+                        className={`cursor-pointer py-1 px-3 sm:py-0.5 sm:px-2 rounded-3xl font-semibold text-xs max-sm:text-lg transition-all duration-300 ${activeButton === "short" ? "bg-pink-400 text-[#4d1b29]" : settings.darkMode ? "hover:text-pink-300 text-gray-300" : "hover:text-[#4d1b29]"}`}>
                         Short Break
                     </button>
                     <button
                         onClick={() => handleModeChange("long")}
-                        className={`cursor-pointer py-0.5 px-2 rounded-3xl font-semibold transition-all duration-300 ${activeButton === "long" ? "bg-pink-400 text-[#4d1b29]" : settings.darkMode ? "hover:text-pink-300 text-gray-300" : "hover:text-[#4d1b29]"}`}>
+                        className={`cursor-pointer py-1 px-3 sm:py-0.5 sm:px-2 rounded-3xl font-semibold text-xs max-sm:text-lg transition-all duration-300 ${activeButton === "long" ? "bg-pink-400 text-[#4d1b29]" : settings.darkMode ? "hover:text-pink-300 text-gray-300" : "hover:text-[#4d1b29]"}`}>
                         Long Break
                     </button>
                 </div>
 
                 <Countdown
+                    key={resetKey}
                     duration={minute}
                     isRunning={isRunning}
                     activeButton={activeButton}
                     hasStarted={hasStarted}
                     onTimeChange={setCurrentTime}
                     darkMode={settings.darkMode}
+                    onReset={handleReset}
                 />
 
-                <div className="flex gap-20 items-center">
+                <div className="flex gap-8 sm:gap-20 items-center flex-wrap justify-center">
                     <button onClick={handleReset} className="cursor-pointer">
-                        <RefreshIcon className="w-8 h-8" />
+                        <RefreshIcon className="w-6 h-6 sm:w-8 sm:h-8" />
                     </button>
 
                     <button
                         onClick={handleStartPause}
-                        className="font-bold text-xl px-10 py-5 gap-2 rounded-3xl flex items-center cursor-pointer shadow-lg hover:opacity-90 active:scale-95 transition-all"
+                        className="font-bold text-base sm:text-xl px-8 sm:px-10 py-4 sm:py-5 gap-2 rounded-3xl flex items-center cursor-pointer shadow-lg hover:opacity-90 active:scale-95 transition-all"
                         style={{ background: "linear-gradient(135deg, #864958 0%, #ffb1c1 100%)" }}>
-                        {isRunning ? <PauseIcon className="w-6 h-6" /> : <PlayerIcon className="w-6 h-6" />}
+                        {isRunning ? <PauseIcon className="w-5 h-5 sm:w-6 sm:h-6" /> : <PlayerIcon className="w-5 h-5 sm:w-6 sm:h-6" />}
                         {isRunning ? "Pause" : "Start"}
                     </button>
 
-                    <div className="w-8 h-8" />
+                    <div className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
 
                 
             </div>
-            <div className="w-xl transition-all duration-300">
+            <div className="w-full max-w-xl transition-all duration-300 px-4 sm:px-0">
                 <div className="flex justify-between p-1">
-                    <p className={`${settings.darkMode ? 'text-gray-300' : ''} transition-colors duration-300`}>progress</p>
-                    <p className={`${settings.darkMode ? 'text-gray-300' : ''} transition-colors duration-300`}>{Math.round(progress)}%</p>
+                    <p className={`${settings.darkMode ? 'text-gray-300' : ''} transition-colors duration-300 text-sm sm:text-base`}>progress</p>
+                    <p className={`${settings.darkMode ? 'text-gray-300' : ''} transition-colors duration-300 text-sm sm:text-base`}>{Math.round(progress)}%</p>
                 </div>
                 <div className={`${settings.darkMode ? 'bg-gray-700' : 'bg-[#d6dfda]'} w-full h-1.5 rounded-3xl overflow-hidden transition-all duration-300`}>
                     <div 
