@@ -140,6 +140,7 @@ function SettingsModal({ isOpen, onClose, settings, onSave }) {
 
 function Countdown({ duration, isRunning, activeButton, hasStarted, onTimeChange, darkMode, onReset }) {
     const [time, setTime] = useState(duration)
+    const [audioRef] = useState(new Audio())
 
     useEffect(() => {
         setTime(duration)
@@ -153,6 +154,10 @@ function Countdown({ duration, isRunning, activeButton, hasStarted, onTimeChange
             setTime(prev => {
                 const newTime = prev - 1
                 onTimeChange(newTime)
+                if(newTime === 0){
+                    audioRef.src = './music/alert.mp3'
+                    audioRef.play()
+                }
                 return newTime
             })
         }, 1000)
